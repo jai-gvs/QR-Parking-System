@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BCP Gate — QR Vehicle &amp; Parking System</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
+
+  :root{
+    --ink:#15181D;
+    --panel:#1D2128;
+    --panel-2:#242933;
+    --line:#333a46;
+    --cream:#EFE9DC;
+    --cream-dim:#B9B3A4;
+    --amber:#EF4444;
+    --amber-dim:#EF4444;
+    --green:#5AA06B;
+    --red:#C1573D;
+    --blue:#5C8AC0;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--ink);color:var(--cream);font-family:'Inter',sans-serif;}
+  body{min-height:100vh;}
+  ::selection{background:var(--amber);color:#1a1a1a;}
+
+  .stripes{
+    height:6px;width:100%;
+    background:repeating-linear-gradient(135deg,var(--amber) 0 14px, #1a1c20 14px 28px);
+  }
+
+  header.app{
+    padding:22px 28px 16px;
+    display:flex; align-items:flex-end; justify-content:space-between; gap:20px;
+    flex-wrap:wrap;
+    border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex; flex-direction:column; gap:2px;}
+  .brand .tag{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.12em; color:var(--amber); text-transform:uppercase;}
+  .brand h1{font-family:'Space Grotesk',sans-serif; font-size:22px; margin:0; font-weight:700; color:var(--cream);}
+  .brand .sub{font-size:12.5px; color:var(--cream-dim); margin-top:2px;}
+
+  .role-switch{display:flex; gap:6px; background:var(--panel); padding:5px; border-radius:999px; border:1px solid var(--line);}
+  .role-switch button{
+    border:none; background:transparent; color:var(--cream-dim); padding:8px 16px; border-radius:999px;
+    font-family:'Inter',sans-serif; font-size:13px; font-weight:600; cursor:pointer; transition:all .15s ease;
+  }
+  .role-switch button.active{background:var(--amber); color:#1a1a1a;}
+  .role-switch button:not(.active):hover{color:var(--cream);}
+
+  nav.subnav{
+    display:flex; gap:4px; padding:14px 28px 0; flex-wrap:wrap;
+  }
+  nav.subnav button{
+    background:none; border:1px solid transparent; color:var(--cream-dim);
+    padding:9px 14px; font-size:13.5px; font-weight:500; font-family:'Inter',sans-serif;
+    cursor:pointer; border-radius:8px 8px 0 0; border-bottom:2px solid transparent;
+  }
+  nav.subnav button.active{color:var(--amber); border-bottom:2px solid var(--amber);}
+  nav.subnav button:hover:not(.active){color:var(--cream); background:var(--panel);}
+
+  main{padding:22px 28px 60px; max-width:1180px; margin:0 auto;}
+  .panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:22px; margin-bottom:20px;
+  }
+  .panel h2{font-family:'Space Grotesk',sans-serif; font-size:17px; margin:0 0 4px; color:var(--cream);}
+  .panel p.hint{color:var(--cream-dim); font-size:13px; margin:0 0 16px;}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  @media(max-width:820px){.grid2{grid-template-columns:1fr;}}
+
+  label{display:block; font-size:12.5px; color:var(--cream-dim); margin:12px 0 5px; font-weight:500;}
+  label:first-of-type{margin-top:0;}
+  input[type=text], input[type=number], select{
+    width:100%; background:var(--ink); border:1px solid var(--line); color:var(--cream);
+    padding:10px 12px; border-radius:7px; font-size:14px; font-family:'Inter',sans-serif;
+  }
+  input:focus, select:focus{outline:1px solid var(--amber); border-color:var(--amber);}
+  .btn{
+    border:none; background:var(--amber); color:#1a1a1a; padding:10px 18px; border-radius:7px;
+    font-weight:600; font-size:13.5px; cursor:pointer; font-family:'Inter',sans-serif; margin-top:16px;
+  }
+  .btn:hover{filter:brightness(1.08);}
+  .btn.secondary{background:var(--panel-2); color:var(--cream); border:1px solid var(--line);}
+  .btn.danger{background:var(--red); color:#fff;}
+  .btn.small{padding:6px 12px; font-size:12.5px; margin-top:0;}
+
+  table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  th{text-align:left; color:var(--cream-dim); font-weight:600; font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; padding:8px 10px; border-bottom:1px solid var(--line);}
+  td{padding:10px; border-bottom:1px solid #2a2f38; vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+
+  .badge{display:inline-block; padding:3px 9px; border-radius:999px; font-size:11px; font-weight:600; font-family:'IBM Plex Mono',monospace;}
+  .badge.vacant{background:rgba(90,160,107,.18); color:var(--green);}
+  .badge.occupied{background:rgba(193,87,61,.18); color:var(--red);}
+  .badge.maintenance{background:rgba(92,138,192,.18); color:var(--blue);}
+  .badge.paid{background:rgba(90,160,107,.18); color:var(--green);}
+  .badge.unpaid{background:rgba(227,162,59,.18); color:var(--amber);}
+  .badge.blocked{background:rgba(193,87,61,.18); color:var(--red);}
+  .badge.active{background:rgba(90,160,107,.18); color:var(--green);}
+
+  .stat-row{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px;}
+  @media(max-width:820px){.stat-row{grid-template-columns:repeat(2,1fr);}}
+  .stat{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px;}
+  .stat .num{font-family:'IBM Plex Mono',monospace; font-size:26px; font-weight:600; color:var(--amber);}
+  .stat .lbl{font-size:12px; color:var(--cream-dim); margin-top:4px;}
+
+  .slot-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(78px,1fr)); gap:10px;}
+  .slot{
+    border:1px solid var(--line); border-radius:8px; padding:10px 6px; text-align:center; cursor:pointer;
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px; user-select:none;
+  }
+  .slot.vacant{background:rgba(90,160,107,.10); border-color:rgba(90,160,107,.4);}
+  .slot.occupied{background:rgba(193,87,61,.12); border-color:rgba(193,87,61,.45);}
+  .slot.maintenance{background:rgba(92,138,192,.12); border-color:rgba(92,138,192,.45);}
+  .slot .plate{display:block; font-size:10px; color:var(--cream-dim); margin-top:3px;}
+
+  .qr-box{background:#fff; padding:14px; border-radius:8px; display:inline-block;}
+  .token-pill{font-family:'IBM Plex Mono',monospace; background:var(--ink); border:1px solid var(--line); padding:8px 12px; border-radius:7px; display:inline-block; margin-top:10px; letter-spacing:.03em;}
+
+  .empty{color:var(--cream-dim); font-size:13.5px; padding:14px 0;}
+  .msg{padding:11px 14px; border-radius:7px; font-size:13.5px; margin-bottom:14px;}
+  .msg.ok{background:rgba(90,160,107,.14); color:var(--green); border:1px solid rgba(90,160,107,.35);}
+  .msg.err{background:rgba(193,87,61,.14); color:var(--red); border:1px solid rgba(193,87,61,.35);}
+
+  .kv{display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed #2a2f38; font-size:13.5px;}
+  .kv:last-child{border-bottom:none;}
+  .kv .k{color:var(--cream-dim);}
+
+  .receipt{border:1px dashed var(--line); border-radius:8px; padding:16px; margin-top:14px; background:var(--ink);}
+  .receipt h3{margin:0 0 10px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--amber); letter-spacing:.05em; text-transform:uppercase;}
+
+  footer{text-align:center; padding:26px; color:var(--cream-dim); font-size:12px;}
+  .link-btn{background:none; border:none; color:var(--amber); text-decoration:underline; cursor:pointer; font-size:inherit; padding:0; font-family:inherit;}
+/* =========================================================
+   LOGIN SCREEN
+   ========================================================= */
+
+.login-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #111419;
+  padding: 20px;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 430px;
+  background: #1d2127;
+  border: 1px solid #343b45;
+  border-radius: 14px;
+  padding: 34px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.45);
+}
+
+.login-brand {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.login-brand .tag {
+  color: #f22b2b;
+  font-family: monospace;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.login-brand h1 {
+  margin: 0;
+  font-size: 25px;
+  color: #f4f5f7;
+}
+
+.login-brand p {
+  color: #aeb6c2;
+  margin: 8px 0 0;
+}
+
+.login-box label {
+  display: block;
+  margin-top: 16px;
+  margin-bottom: 7px;
+  color: #d7dbe1;
+}
+
+.login-box input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.login-button {
+  width: 100%;
+  margin-top: 24px;
+  padding: 13px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: #f2a62b;
+  color: #111419;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  filter: brightness(1.08);
+}
+
+.login-button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.login-error {
+  display: none;
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 7px;
+  background: #3a2020;
+  border: 1px solid #714040;
+  color: #ff8f8f;
+}
+
+.login-user {
+  margin-top: 14px;
+  text-align: center;
+  color: #8f98a5;
+  font-size: 13px;
+}
+</style>
+</head>
+<body>
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" style="
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:
+    linear-gradient(rgba(18,21,26,.80), rgba(18,21,26,.80)),
+    url('Bestlink College Parking Entrance.png') center / cover no-repeat;
+  background-color:#12151a;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+">
+
+  <div style="
+    width:100%;
+    max-width:520px;
+    background:#1d222a;
+    border:1px solid #343b45;
+    border-radius:18px;
+    padding:35px;
+    box-shadow:0 20px 60px rgba(0,0,0,.45);
+  ">
+
+    <div style="text-align:center; margin-bottom:28px;">
+
+      <img src="logo.png" alt="BCP Logo" style="display:block;width:110px;height:auto;margin:0 auto 16px;">
+
+      <div style="
+        color:#f0a72f;
+        font-size:13px;
+        font-weight:700;
+        letter-spacing:2px;
+        margin-bottom:8px;
+      ">
+        BESTLINK COLLEGE OF THE PHILIPPINES
+      </div>
+
+      <h1 style="margin:0; font-size:28px; color:#f4f5f7;">
+        BCP Gate System
+      </h1>
+
+      <p style="color:#c2aeae; margin:8px 0 0;">
+        QR Vehicle Entry, Exit & Parking System
+      </p>
+
+    </div>
+    <!-- keep the rest of your login form below this line -->
+
+
+    <!-- LOGIN TYPE -->
+
+    <div style="
+      color:#dce2e8;
+      font-weight:700;
+      margin-bottom:12px;
+    ">
+      Select Login Type
+    </div>
+
+
+    <div id="loginRoleButtons" style="
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+      margin-bottom:24px;
+    ">
+
+      <button
+        type="button"
+        class="login-role-btn active"
+        data-role="attendant"
+        onclick="selectLoginRole('attendant')"
+        style="
+          padding:14px 8px;
+          border-radius:10px;
+          border:1px solid #3a424d;
+          background:#efa72f;
+          color:#111;
+          font-weight:700;
+          cursor:pointer;
+        "
+      >
+        🛡️<br>
+        Attendant
+      </button>
+
+
+      <button
+        type="button"
+        class="login-role-btn"
+        data-role="admin"
+        onclick="selectLoginRole('admin')"
+        style="
+          padding:14px 8px;
+          border-radius:10px;
+          border:1px solid #3a424d;
+          background:#20252d;
+          color:#dce2e8;
+          font-weight:700;
+          cursor:pointer;
+        "
+      >
+        👑<br>
+        Admin
+      </button>
+
+    </div>
+
+
+    <!-- LOGIN FORM -->
+
+    <form id="loginForm">
+
+      <label style="
+        display:block;
+        color:#dce2e8;
+        margin-bottom:7px;
+      ">
+        Username
+      </label>
+
+      <input
+        id="loginUsername"
+        type="text"
+        placeholder="Enter username"
+        autocomplete="username"
+        required
+        style="
+          width:100%;
+          box-sizing:border-box;
+          padding:13px;
+          margin-bottom:17px;
+          border-radius:9px;
+          border:1px solid #3a424d;
+          background:#12151a;
+          color:#fff;
+          font-size:15px;
+        "
+      >
+
+
+      <label style="
+        display:block;
+        color:#dce2e8;
+        margin-bottom:7px;
+      ">
+        Password
+      </label>
+
+      <input
+        id="loginPassword"
+        type="password"
+        placeholder="Enter password"
+        autocomplete="current-password"
+        required
+        style="
+          width:100%;
+          box-sizing:border-box;
+          padding:13px;
+          margin-bottom:20px;
+          border-radius:9px;
+          border:1px solid #3a424d;
+          background:#12151a;
+          color:#fff;
+          font-size:15px;
+        "
+      >
+
+
+      <button
+        type="submit"
+        style="
+          width:100%;
+          padding:14px;
+          border:0;
+          border-radius:10px;
+          background:#efa72f;
+          color:#111;
+          font-size:16px;
+          font-weight:800;
+          cursor:pointer;
+        "
+      >
+        Login
+      </button>
+
+
+      <div
+        id="loginMessage"
+        style="
+          text-align:center;
+          margin-top:15px;
+          min-height:22px;
+          font-weight:600;
+        "
+      ></div>
+
+    </form>
+
+
+    <div style="
+      text-align:center;
+      color:#7f8995;
+      font-size:12px;
+      margin-top:20px;
+    ">
+      Authorized users only
+    </div>
+
+  </div>
+
+</div>
+
+  </div>
+</div>
+<div class="stripes"></div>
+<header class="app">
+  <div class="brand">
+    <div class="tag">Bestlink College of the Philippines</div>
+    <h1>QR Vehicle Entry, Exit &amp; Parking System</h1>
+    <div class="sub">Digital payment · slot management · gate operations</div>
+  </div>
+  <div class="role-switch" id="roleSwitch"></div>
+</header>
+
+<nav class="subnav" id="subnav"></nav>
+
+<main id="main"></main>
+
+<footer>Demo data is stored for this artifact and shared across anyone using it here — reset anytime from Admin → Danger Zone.</footer>
+
+<script>
+/* ---------------------------------------------------------------
+   STATE
+--------------------------------------------------------------- */
+const STORAGE_KEY = 'bcp-parking-state-v1';
+let state = null;
+let currentRole = 'attendant';
+let currentTab = {};
+let banner = null;
+
+function defaultState(){
+  const slots = [];
+  ['A','B','C'].forEach(zone=>{
+    for(let i=1;i<=8;i++){
+      slots.push({id:`${zone}${i}`, zone, status:'vacant', plate:null});
+    }
+  });
+  return {
+    students:[
+      {studentId:'2023-00145', name:'Juan Dela Cruz', course:'BSCpE'},
+      {studentId:'2023-00298', name:'Maria Santos', course:'BSIT'},
+    ],
+    vehicles:[
+      {plate:'ABC-1234', studentId:'2023-00145', type:'Motorcycle', qrToken:'BCP-QR-000001', status:'active'},
+      {plate:'XYZ-5678', studentId:'2023-00298', type:'Sedan', qrToken:'BCP-QR-000002', status:'active'},
+    ],
+    slots,
+    logs:[],
+    users:[
+      {username:'admin', name:'System Administrator', role:'admin'},
+      {username:'guard1', name:'Security Guard 1', role:'attendant'},
+    ],
+    rates:{firstHour:20, extraHour:10},
+    seq:3
+  };
+}
+
+const API_BASE = 'http://127.0.0.1:8000';
+
+async function loadState(){
+  try{
+    const res = await fetch(API_BASE + '/api/state');
+    if(!res.ok) throw new Error('API unavailable');
+    state = await res.json();
+    render();
+  }catch(e){
+    state = defaultState();
+    setBanner('err','Python API is not running. Start the FastAPI server first.');
+    render();
+  }
+}
+
+let saveTimer=null;
+function saveState(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async ()=>{
+    try{
+      const res = await fetch(API_BASE + '/api/state', {
+        method:'PUT',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(state)
+      });
+      if(!res.ok) throw new Error('Save failed');
+    }catch(e){
+      console.error('save failed', e);
+      setBanner('err','Could not save to the Python API.');
+      render();
+    }
+  }, 150);
+}
+
+function genToken(){
+  state.seq += 1;
+  return 'BCP-QR-' + String(state.seq).padStart(6,'0');
+}
+function genRef(prefix){
+  return prefix + '-' + Date.now().toString().slice(-8) + Math.floor(Math.random()*90+10);
+}
+function findVehicle(plateOrToken){
+  return state.vehicles.find(v=>v.qrToken===plateOrToken || v.plate.toUpperCase()===plateOrToken.toUpperCase());
+}
+function studentOf(vehicle){
+  return state.students.find(s=>s.studentId===vehicle.studentId);
+}
+function fmtTime(iso){
+  if(!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleString('en-PH',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+function computeFee(minutes, rates){
+  if(minutes<=60) return rates.firstHour;
+  const extra = Math.ceil((minutes-60)/60);
+  return rates.firstHour + extra*rates.extraHour;
+}
+function setBanner(type,text){ banner={type,text}; }
+
+/* ---------------------------------------------------------------
+   NAV CONFIG
+--------------------------------------------------------------- */
+const NAV = {
+  attendant:[
+    ['entry','Scan QR — Entrance'],
+    ['exit','Scan QR — Exit'],
+    ['register','Register Vehicle'],
+    ['vehicles','Registered Vehicles &amp; QR'],
+    ['slots','Manage Parking Slots'],
+    ['overview','Parking Information'],
+    ['reports','Generate Reports'],
+  ],
+  admin:[
+    ['register','Register Vehicle'],
+    ['qrs','Registered Vehicles &amp; QR'],
+    ['users','Manage Users'],
+    ['vehicles','Manage Vehicles'],
+    ['payments','Manage Payment Records'],
+    ['reports','Reports &amp; Rates'],
+  ],
+};
+
+
+
+function switchTab(role,tab){
+  currentTab[role]=tab; banner=null; render();
+}
+
+/* ---------------------------------------------------------------
+   RENDER SHELL
+--------------------------------------------------------------- */
+function render(){
+  const rs = document.getElementById('roleSwitch');
+
+rs.innerHTML = `
+  <span style="
+    padding:8px 14px;
+    color:var(--amber);
+    font-weight:700;
+    font-size:13px;
+  ">
+    ${
+      currentRole === 'attendant'
+        ? 'Attendant'
+        : 'Administrator'
+    }
+  </span>
+
+  <button
+    class="btn small danger"
+    onclick="logoutUser()"
+    style="margin-left:10px;"
+  >
+    Logout
+  </button>
+`;
+
+  const tab = currentTab[currentRole] || NAV[currentRole][0][0];
+  currentTab[currentRole]=tab;
+  const sn = document.getElementById('subnav');
+  sn.innerHTML = NAV[currentRole].map(([id,label])=>
+    `<button class="${id===tab?'active':''}" onclick="switchTab('${currentRole}','${id}')">${label}</button>`
+  ).join('');
+
+  const main = document.getElementById('main');
+  let html = '';
+  if(banner) html += `<div class="msg ${banner.type==='ok'?'ok':'err'}">${banner.text}</div>`;
+
+  if(currentRole==='attendant') html += renderAttendant(tab);
+  if(currentRole==='admin') html += renderAdmin(tab);
+
+  main.innerHTML = html;
+  wireEvents(tab);
+}
+
+/* ===================================================================
+   STUDENT VIEWS
+=================================================================== */
+function studentRegister(){
+  return `
+  <div class="panel" style="max-width:520px;">
+    <h2>Register Vehicle</h2>
+    <p class="hint">One-time student and vehicle registration. A unique QR code is generated for gate scanning.</p>
+    <form id="regForm">
+      <label>Student ID</label>
+      <input type="text" name="studentId" placeholder="e.g. 2023-00457" required>
+      <label>Full Name</label>
+      <input type="text" name="name" placeholder="e.g. Ana Reyes" required>
+      <label>Course / Program</label>
+      <input type="text" name="course" placeholder="e.g. BSCpE">
+      <label>Plate Number</label>
+      <input type="text" name="plate" placeholder="e.g. NBP-2245" required>
+      <label>Vehicle Type</label>
+      <select name="type">
+        <option>Motorcycle</option>
+        <option>Sedan</option>
+        <option>SUV</option>
+        <option>Van</option>
+      </select>
+      <button class="btn" type="submit">Register &amp; Generate QR</button>
+    </form>
+  </div>`;
+}
+
+function studentMyQR(){
+  if(state.vehicles.length===0) return `<div class="panel"><p class="empty">No vehicles registered yet.</p></div>`;
+  return `<div class="grid2">${state.vehicles.map(v=>{
+    const s = studentOf(v);
+    return `<div class="panel">
+      <h2>${v.plate}</h2>
+      <p class="hint">${s?s.name+' · '+s.studentId:'Unknown student'} · ${v.type}</p>
+      <div class="qr-box" id="qr-${v.plate.replace(/[^A-Za-z0-9]/g,'')}"></div>
+      <div class="token-pill">${v.qrToken}</div><br>
+      <span class="badge ${v.status==='active'?'active':'blocked'}">${v.status}</span>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* ===================================================================
+   ATTENDANT VIEWS
+=================================================================== */
+function renderAttendant(tab){
+  if(tab==='register') return studentRegister();
+  if(tab==='vehicles') return studentMyQR();
+  if(tab==='entry') return attendantEntry();
+  if(tab==='exit') return attendantExit();
+  if(tab==='slots') return attendantSlots();
+  if(tab==='overview') return attendantOverview();
+  if(tab==='reports') return reportsPanel();
+}
+
+function attendantEntry(){
+  const active = state.vehicles.filter(
+    v => !state.logs.some(l => l.plate === v.plate && l.status === 'inside')
+  );
+
+  return `
+  <div class="grid2">
+
+    <div class="panel">
+      <h2>Scan QR — Entrance</h2>
+
+      <p class="hint">
+        Scan the vehicle QR code at the entrance.
+        The system will find the vehicle and show the parking fee before payment.
+      </p>
+
+      <form id="entryForm">
+
+        <label>QR Token or Plate Number</label>
+
+        <input
+          type="text"
+          name="token"
+          id="entryToken"
+          placeholder="BCP-QR-000001"
+          required
+          autocomplete="off"
+        >
+
+        <button class="btn" type="submit">
+          Scan &amp; Check Fee
+        </button>
+
+      </form>
+
+      <p class="hint" style="margin-top:16px;">
+        Registered vehicles not currently inside:
+        ${active.map(v=>v.plate).join(', ') || 'none'}
+      </p>
+
+    </div>
+
+    <div class="panel">
+
+      <h2>Entrance Payment</h2>
+
+      <p class="hint">
+        Scan a QR first. Payment information will appear here.
+      </p>
+
+      <div id="entryPaymentPanel">
+
+        <div class="empty">
+          No vehicle scanned yet.
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>`;
+}
+
+function attendantExit(){
+
+  const inside = state.logs.filter(
+    l => l.status === 'inside'
+  );
+
+  return `
+  <div class="panel" style="max-width:560px;">
+
+    <h2>Scan QR — Exit</h2>
+
+    <p class="hint">
+      Scan the vehicle QR code before allowing the vehicle to leave.
+      The system will verify that the entrance payment has been completed.
+    </p>
+
+    <form id="exitForm">
+
+      <label>QR Token or Plate Number</label>
+
+      <input
+        type="text"
+        name="token"
+        id="exitToken"
+        placeholder="BCP-QR-000001"
+        required
+        autocomplete="off"
+      >
+
+      <button class="btn" type="submit">
+        Verify Payment
+      </button>
+
+    </form>
+
+    <div id="exitReceipt"></div>
+
+    <p class="hint" style="margin-top:16px;">
+      Currently parked:
+      ${
+        inside.map(l=>l.plate+' ('+l.slot+')').join(', ')
+        || 'none'
+      }
+    </p>
+
+  </div>`;
+}
+
+function attendantSlots(){
+  return `<div class="panel">
+    <h2>Manage Parking Slots</h2>
+    <p class="hint">Click a vacant or maintenance slot to update its status. Occupied slots free up automatically on exit.</p>
+    <div class="slot-grid">
+      ${state.slots.map(s=>`
+        <div class="slot ${s.status}" onclick="toggleSlot('${s.id}')" title="Slot ${s.id}">
+          ${s.id}
+          <span class="plate">${s.status==='occupied'?s.plate:(s.status==='maintenance'?'closed':'open')}</span>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+function toggleSlot(id){
+  const slot = state.slots.find(s=>s.id===id);
+  if(slot.status==='occupied'){ setBanner('err','Cannot change an occupied slot manually — process the vehicle exit first.'); render(); return; }
+  slot.status = slot.status==='vacant' ? 'maintenance' : 'vacant';
+  saveState(); render();
+}
+
+function attendantOverview(){
+  const vacant = state.slots.filter(s=>s.status==='vacant').length;
+  const occupied = state.slots.filter(s=>s.status==='occupied').length;
+  const maint = state.slots.filter(s=>s.status==='maintenance').length;
+  const inside = state.logs.filter(l=>!l.timeOut);
+  return `
+  <div class="stat-row">
+    <div class="stat"><div class="num">${occupied}</div><div class="lbl">Occupied slots</div></div>
+    <div class="stat"><div class="num">${vacant}</div><div class="lbl">Vacant slots</div></div>
+    <div class="stat"><div class="num">${maint}</div><div class="lbl">Under maintenance</div></div>
+    <div class="stat"><div class="num">${state.slots.length}</div><div class="lbl">Total capacity</div></div>
+  </div>
+  <div class="panel">
+    <h2>Vehicles Currently Parked</h2>
+    ${inside.length===0?'<p class="empty">No vehicles currently inside.</p>':`
+    <table><thead><tr><th>Plate</th><th>Slot</th><th>Student</th><th>Time In</th></tr></thead>
+    <tbody>${inside.map(l=>{
+      const v=findVehicle(l.plate); const s=v?studentOf(v):null;
+      return `<tr><td class="mono">${l.plate}</td><td class="mono">${l.slotId}</td><td>${s?s.name:'—'}</td><td>${fmtTime(l.timeIn)}</td></tr>`;
+    }).join('')}</tbody></table>`}
+  </div>`;
+}
+
+/* ===================================================================
+   ADMIN VIEWS
+=================================================================== */
+function renderAdmin(tab){
+  if(tab==='register') return studentRegister();
+  if(tab==='qrs') return studentMyQR();
+  if(tab==='users') return adminUsers();
+  if(tab==='vehicles') return adminVehicles();
+  if(tab==='payments') return adminPayments();
+  if(tab==='reports') return reportsPanel(true);
+}
+
+function adminUsers(){
+  return `<div class="grid2">
+    <div class="panel">
+      <h2>Manage Users</h2>
+      <p class="hint">System accounts for attendants and administrators.</p>
+      <table><thead><tr><th>Username</th><th>Name</th><th>Role</th><th></th></tr></thead>
+      <tbody>${state.users.map((u,i)=>`
+        <tr><td class="mono">${u.username}</td><td>${u.name}</td><td style="text-transform:capitalize">${u.role}</td>
+        <td><button class="btn small danger" onclick="deleteUser(${i})">Remove</button></td></tr>`).join('')}
+      </tbody></table>
+    </div>
+    <div class="panel">
+      <h2>Add User</h2>
+     <form id="userForm">
+  <label>Username</label>
+  <input type="text" name="username" placeholder="e.g. guard2" required>
+
+  <label>Full Name</label>
+  <input type="text" name="name" placeholder="e.g. Security Guard 2" required>
+
+  <label>Password</label>
+  <input type="password" name="password" placeholder="Enter password" required>
+
+  <label>Role</label>
+  <select name="role">
+    <option value="attendant">Security Attendant</option>
+    <option value="admin">Administrator</option>
+  </select>
+
+  <button class="btn" type="submit">Add User</button>
+</form>
+    </div>
+  </div>`;
+}
+function deleteUser(i){ state.users.splice(i,1); saveState(); render(); }
+
+function adminVehicles(){
+  return `<div class="panel">
+    <h2>Manage Vehicles</h2>
+    <p class="hint">All registered vehicles and their linked students. Block a vehicle to prevent gate entry.</p>
+    <table><thead><tr><th>Plate</th><th>Type</th><th>Student</th><th>QR Token</th><th>Status</th><th></th></tr></thead>
+    <tbody>${state.vehicles.map((v,i)=>{
+      const s=studentOf(v);
+      return `<tr>
+        <td class="mono">${v.plate}</td><td>${v.type}</td><td>${s?s.name+' ('+s.studentId+')':'—'}</td>
+        <td class="mono">${v.qrToken}</td>
+        <td><span class="badge ${v.status==='active'?'active':'blocked'}">${v.status}</span></td>
+        <td>
+          <button class="btn small secondary" onclick="toggleVehicleBlock(${i})">${v.status==='active'?'Block':'Unblock'}</button>
+          <button class="btn small danger" onclick="deleteVehicle(${i})">Remove</button>
+        </td>
+      </tr>`;
+    }).join('')}</tbody></table>
+  </div>`;
+}
+function toggleVehicleBlock(i){
+  state.vehicles[i].status = state.vehicles[i].status==='active' ? 'blocked' : 'active';
+  saveState(); render();
+}
+function deleteVehicle(i){ state.vehicles.splice(i,1); saveState(); render(); }
+
+function adminPayments(){
+  const logs = [...state.logs].reverse();
+  return `<div class="panel">
+    <h2>Manage Payment Records</h2>
+    <p class="hint">Every completed parking transaction, with payment status and reference number.</p>
+    ${logs.length===0?'<p class="empty">No transactions recorded yet.</p>':`
+    <table><thead><tr><th>Plate</th><th>Time In</th><th>Time Out</th><th>Fee</th><th>Method</th><th>Reference</th><th>Status</th><th></th></tr></thead>
+    <tbody>${logs.map(l=>`
+      <tr>
+        <td class="mono">${l.plate}</td><td>${fmtTime(l.timeIn)}</td><td>${fmtTime(l.timeOut)}</td>
+        <td class="mono">${l.fee!=null?'₱'+l.fee:'—'}</td>
+        <td>${l.paymentMethod||'—'}</td><td class="mono">${l.refNumber||'—'}</td>
+        <td><span class="badge ${l.paymentStatus||'unpaid'}">${l.timeOut?(l.paymentStatus||'unpaid'):'in progress'}</span></td>
+        <td>${(l.timeOut && l.paymentStatus==='unpaid')?`<button class="btn small" onclick="adminMarkPaid(${l.id})">Mark Paid (Cash)</button>`:''}</td>
+      </tr>`).join('')}</tbody></table>`}
+  </div>`;
+}
+function adminMarkPaid(id){
+  const log = state.logs.find(l=>l.id===id);
+  log.paymentStatus='paid'; log.paymentMethod='Cash'; log.refNumber=genRef('PAY'); log.paidAt=new Date().toISOString();
+  saveState(); setBanner('ok','Marked as paid.'); render();
+}
+
+function reportsPanel(showRates){
+  const completed = state.logs.filter(l=>l.timeOut);
+  const revenue = completed.filter(l=>l.paymentStatus==='paid').reduce((a,l)=>a+l.fee,0);
+  const pending = completed.filter(l=>l.paymentStatus==='unpaid').reduce((a,l)=>a+l.fee,0);
+  const occupied = state.slots.filter(s=>s.status==='occupied').length;
+  return `
+  <div class="stat-row">
+    <div class="stat"><div class="num">₱${revenue}</div><div class="lbl">Revenue collected</div></div>
+    <div class="stat"><div class="num">₱${pending}</div><div class="lbl">Pending payments</div></div>
+    <div class="stat"><div class="num">${completed.length}</div><div class="lbl">Completed sessions</div></div>
+    <div class="stat"><div class="num">${occupied}/${state.slots.length}</div><div class="lbl">Slots occupied now</div></div>
+  </div>
+  ${showRates?`
+  <div class="panel" style="max-width:420px;">
+    <h2>Parking Rate Configuration</h2>
+    <form id="ratesForm">
+      <label>First hour rate (₱)</label>
+      <input type="number" name="firstHour" value="${state.rates.firstHour}" min="0" required>
+      <label>Additional hour rate (₱)</label>
+      <input type="number" name="extraHour" value="${state.rates.extraHour}" min="0" required>
+      <button class="btn" type="submit">Save Rates</button>
+    </form>
+  </div>
+  <div class="panel" style="max-width:420px;">
+    <h2>Danger Zone</h2>
+    <p class="hint">Wipes all vehicles, students, logs and slots back to demo defaults.</p>
+    <button class="btn danger" onclick="resetDemo()">Reset Demo Data</button>
+  </div>`:''}
+  <div class="panel">
+    <h2>Transaction Report</h2>
+    <button class="btn secondary" onclick="exportCsv()">Export CSV</button>
+    ${completed.length===0?'<p class="empty" style="margin-top:14px;">No completed sessions to report yet.</p>':`
+    <table style="margin-top:14px;"><thead><tr><th>Plate</th><th>In</th><th>Out</th><th>Fee</th><th>Status</th></tr></thead>
+    <tbody>${completed.slice().reverse().map(l=>`<tr><td class="mono">${l.plate}</td><td>${fmtTime(l.timeIn)}</td><td>${fmtTime(l.timeOut)}</td><td class="mono">₱${l.fee}</td><td><span class="badge ${l.paymentStatus}">${l.paymentStatus}</span></td></tr>`).join('')}</tbody></table>`}
+  </div>`;
+}
+function exportCsv(){
+  const rows = [['Plate','TimeIn','TimeOut','Fee','PaymentStatus','Method','Reference']];
+  state.logs.filter(l=>l.timeOut).forEach(l=>rows.push([l.plate,l.timeIn,l.timeOut,l.fee,l.paymentStatus,l.paymentMethod||'',l.refNumber||'']));
+  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='bcp-parking-report.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+function resetDemo(){
+  state = defaultState();
+  saveState();
+  setBanner('ok','Demo data reset.');
+  render();
+}
+/* ---------------------------------------------------------------
+   PARKING API HELPERS
+--------------------------------------------------------------- */
+
+function authHeaders(){
+
+  const token = localStorage.getItem('bcp_access_token');
+
+  return {
+    'Content-Type':'application/json',
+    'Authorization':'Bearer ' + token
+  };
+
+}
+
+async function readApiResponse(response){
+
+  const data = await response.json().catch(()=>({}));
+
+  if(!response.ok){
+
+    throw new Error(
+      data.detail || 'The parking server rejected the request.'
+    );
+
+  }
+
+  return data;
+
+}
+/* ---------------------------------------------------------------
+   EVENT WIRING (per render pass)
+--------------------------------------------------------------- */
+
+function logTimeIn(log){ return log.timeIn || log.in || null; }
+function logTimeOut(log){ return log.timeOut || log.out || null; }
+function logSlot(log){ return log.slotId || log.slot || '—'; }
+function isActiveLog(log){ return log.status === 'inside' || (!log.status && !logTimeOut(log)); }
+
+async function collectEntrancePayment(qrToken, requiredAmount){
+  const amountInput = document.getElementById('entryPaymentAmount');
+  const methodInput = document.getElementById('entryPaymentMethod');
+  const amount = Number(amountInput ? amountInput.value : requiredAmount);
+  const method = methodInput ? methodInput.value : 'Cash';
+  const panel = document.getElementById('entryPaymentPanel');
+
+  if(!Number.isFinite(amount) || amount < Number(requiredAmount)){
+    if(panel) panel.innerHTML = '<div class="msg err">Payment must be at least ₱' + Number(requiredAmount).toFixed(2) + '.</div>';
+    return;
+  }
+
+  if(panel) panel.innerHTML = '<div class="empty">Processing payment...</div>';
+
+  try{
+    const response = await fetch(API_BASE + '/api/parking/payment', {
+      method:'POST',
+      headers:authHeaders(),
+      body:JSON.stringify({qrToken, amount, method})
+    });
+    const data = await readApiResponse(response);
+    await loadState();
+    setBanner('ok', `Payment received via ${method} for ${data.vehicle.plate}. Entry confirmed. Assigned slot ${data.slot.id}.`);
+    currentTab.attendant = 'entry';
+    render();
+  }catch(error){
+    console.error('Payment error:', error);
+    if(panel) panel.innerHTML = `<div class="msg err">${error.message}</div>`;
+  }
+}
+window.collectEntrancePayment = collectEntrancePayment;
+
+async function confirmVehicleExit(qrToken){
+  const receipt = document.getElementById('exitReceipt');
+  if(receipt) receipt.innerHTML = '<div class="empty">Processing vehicle exit...</div>';
+  try{
+    const response = await fetch(API_BASE + '/api/parking/exit', {
+      method:'POST',
+      headers:authHeaders(),
+      body:JSON.stringify({qrToken})
+    });
+    const data = await readApiResponse(response);
+    await loadState();
+    setBanner('ok', `${data.message} Parking slot ${data.slotReleased} is now vacant.`);
+    currentTab.attendant = 'exit';
+    render();
+  }catch(error){
+    console.error('Vehicle exit error:', error);
+    if(receipt) receipt.innerHTML = `<div class="msg err">${error.message}</div>`;
+  }
+}
+window.confirmVehicleExit = confirmVehicleExit;
+
+function wireEvents(tab){
+  const regForm = document.getElementById('regForm');
+  if(regForm) regForm.onsubmit = e=>{
+    e.preventDefault();
+    const f = new FormData(regForm);
+    const plate = String(f.get('plate') || '').trim().toUpperCase();
+    const studentId = String(f.get('studentId') || '').trim();
+    if(state.vehicles.some(v=>v.plate===plate)){
+      setBanner('err','A vehicle with this plate is already registered.'); render(); return;
+    }
+    if(!state.students.some(s=>s.studentId===studentId)){
+      state.students.push({studentId, name:String(f.get('name')||'').trim(), course:String(f.get('course')||'').trim()});
+    }
+    const token = genToken();
+    state.vehicles.push({plate, studentId, type:f.get('type'), qrToken:token, status:'active'});
+    saveState();
+    setBanner('ok',`Vehicle ${plate} registered. QR token: ${token}`);
+    currentTab[currentRole]=(currentRole==='admin'?'qrs':'vehicles');
+    render();
+  };
+
+  const entryForm = document.getElementById('entryForm');
+  if(entryForm) entryForm.onsubmit = async e=>{
+    e.preventDefault();
+    const token = String(new FormData(entryForm).get('token') || '').trim();
+    const paymentPanel = document.getElementById('entryPaymentPanel');
+    if(!token){ if(paymentPanel) paymentPanel.innerHTML='<div class="msg err">Please scan or enter a QR token.</div>'; return; }
+    if(paymentPanel) paymentPanel.innerHTML='<div class="empty">Checking vehicle and parking fee...</div>';
+    try{
+      const response = await fetch(API_BASE + '/api/parking/entry/prepare', {
+        method:'POST', headers:authHeaders(), body:JSON.stringify({qrToken:token})
+      });
+      const data = await readApiResponse(response);
+      const vehicle=data.vehicle, slot=data.slot, amount=data.amount;
+      if(paymentPanel) paymentPanel.innerHTML=`
+        <div class="receipt">
+          <h3>Entrance Payment</h3>
+          <div class="kv"><span class="k">Vehicle</span><strong>${vehicle.plate}</strong></div>
+          <div class="kv"><span class="k">QR Token</span><span class="mono">${vehicle.qrToken}</span></div>
+          <div class="kv"><span class="k">Student ID</span><span>${vehicle.studentId || '—'}</span></div>
+          <div class="kv"><span class="k">Vehicle Type</span><span>${vehicle.type || '—'}</span></div>
+          <div class="kv"><span class="k">Assigned Slot</span><strong>${slot.id}</strong></div>
+          <div class="kv"><span class="k">Parking Fee</span><strong style="color:var(--amber);font-size:18px;">₱${Number(amount).toFixed(2)}</strong></div>
+          <div style="margin-top:14px;"><span class="badge unpaid">PAYMENT REQUIRED</span></div>
+          <label>Payment Method</label>
+          <select id="entryPaymentMethod"><option value="Cash">Cash</option><option value="GCash">GCash</option><option value="Maya">Maya</option></select>
+          <label>Amount Received</label>
+          <input type="number" id="entryPaymentAmount" value="${amount}" min="${amount}" step="0.01">
+          <button class="btn" type="button" onclick="collectEntrancePayment('${vehicle.qrToken}', ${amount})">Collect ₱${Number(amount).toFixed(2)} &amp; Confirm Entry</button>
+        </div>`;
+    }catch(error){
+      console.error('Entrance scan error:',error);
+      if(paymentPanel) paymentPanel.innerHTML=`<div class="msg err">${error.message}</div>`;
+    }
+  };
+
+  const exitForm = document.getElementById('exitForm');
+  if(exitForm) exitForm.onsubmit = async e=>{
+    e.preventDefault();
+    const token=String(new FormData(exitForm).get('token') || '').trim();
+    const receipt=document.getElementById('exitReceipt');
+    if(!token){ if(receipt) receipt.innerHTML='<div class="msg err">Please scan or enter a QR token.</div>'; return; }
+    if(receipt) receipt.innerHTML='<div class="empty">Verifying payment...</div>';
+    try{
+      const response=await fetch(API_BASE+'/api/parking/exit/prepare',{method:'POST',headers:authHeaders(),body:JSON.stringify({qrToken:token})});
+      const data=await readApiResponse(response);
+      const vehicle=data.vehicle, session=data.session;
+      if(receipt) receipt.innerHTML=`
+        <div class="receipt">
+          <h3>Exit Verification</h3>
+          <div class="kv"><span class="k">Vehicle</span><strong>${vehicle.plate}</strong></div>
+          <div class="kv"><span class="k">QR Token</span><span class="mono">${vehicle.qrToken}</span></div>
+          <div class="kv"><span class="k">Parking Slot</span><strong>${logSlot(session)}</strong></div>
+          <div class="kv"><span class="k">Time In</span><span>${fmtTime(logTimeIn(session))}</span></div>
+          <div class="kv"><span class="k">Paid Amount</span><strong>₱${Number(session.paidAmount || session.fee || 0).toFixed(2)}</strong></div>
+          <div class="kv"><span class="k">Payment Status</span><span class="badge paid">PAID</span></div>
+          <div class="msg ok" style="margin-top:14px;">Payment verified. Exit is allowed.</div>
+          <button class="btn" type="button" onclick="confirmVehicleExit('${vehicle.qrToken}')">Confirm Exit</button>
+        </div>`;
+    }catch(error){
+      console.error('Exit verification error:',error);
+      if(receipt) receipt.innerHTML=`<div class="msg err">${error.message}</div>`;
+    }
+  };
+
+  const userForm=document.getElementById('userForm');
+  if(userForm) userForm.onsubmit=async e=>{
+    e.preventDefault();
+    const f=new FormData(userForm);
+    const username=String(f.get('username')||'').trim();
+    const name=String(f.get('name')||'').trim();
+    const password=String(f.get('password')||'');
+    const role=String(f.get('role')||'attendant');
+    const token=localStorage.getItem('bcp_access_token');
+    if(!token){setBanner('err','You are not logged in.');render();return;}
+    try{
+      const response=await fetch(API_BASE+'/api/users',{method:'POST',headers:authHeaders(),body:JSON.stringify({username,name,password,role})});
+      await readApiResponse(response);
+      setBanner('ok',`User ${username} created successfully.`);
+      await loadState();
+    }catch(error){console.error('Create user error:',error);setBanner('err',error.message);render();}
+  };
+
+  const ratesForm=document.getElementById('ratesForm');
+  if(ratesForm) ratesForm.onsubmit=e=>{
+    e.preventDefault(); const f=new FormData(ratesForm);
+    state.rates.firstHour=Number(f.get('firstHour')); state.rates.extraHour=Number(f.get('extraHour'));
+    saveState(); setBanner('ok','Rates updated.'); render();
+  };
+
+  if((currentRole==='attendant' && currentTab.attendant==='vehicles') || (currentRole==='admin' && currentTab.admin==='qrs')){
+    state.vehicles.forEach(v=>{
+      const el=document.getElementById('qr-'+v.plate.replace(/[^A-Za-z0-9]/g,''));
+      if(el && window.QRCode){el.innerHTML='';new QRCode(el,{text:v.qrToken,width:120,height:120,colorDark:'#15181D',colorLight:'#ffffff'});}
+    });
+  }
+}
+
+// =====================================================
+// LOGIN / AUTHENTICATION
+// =====================================================
+let selectedLoginRole='attendant';
+const LOGIN_API=API_BASE;
+
+function selectLoginRole(role){
+  if(!['attendant','admin'].includes(role)) return;
+  selectedLoginRole=role;
+  document.querySelectorAll('.login-role-btn').forEach(button=>{
+    const active=button.getAttribute('data-role')===role;
+    button.style.background=active?'#efa72f':'#20252d';
+    button.style.color=active?'#111':'#dce2e8';
+    button.style.opacity=active?'1':'0.65';
+    button.style.borderColor=active?'#efa72f':'#3a424d';
+    button.classList.toggle('active',active);
+  });
+}
+window.selectLoginRole=selectLoginRole;
+
+async function loginUser(username,password){
+  const message=document.getElementById('loginMessage');
+  const loginButton=document.querySelector('#loginForm button[type="submit"]');
+  if(message){message.style.color='#f2a62b';message.textContent='Logging in...';}
+  if(loginButton){loginButton.disabled=true;loginButton.textContent='Logging in...';}
+  try{
+    const response=await fetch(LOGIN_API+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok) throw new Error(data.detail||'Invalid username or password.');
+    if(!data.user||!data.access_token) throw new Error('Login server returned invalid information.');
+    if(data.user.role!==selectedLoginRole) throw new Error('This account is not a '+selectedLoginRole+' account.');
+    localStorage.setItem('bcp_access_token',data.access_token);
+    localStorage.setItem('bcp_username',data.user.username);
+    localStorage.setItem('bcp_name',data.user.name);
+    localStorage.setItem('bcp_role',data.user.role);
+    currentRole=data.user.role;
+    if(!currentTab[currentRole]) currentTab[currentRole]=NAV[currentRole][0][0];
+    if(message){message.style.color='#55c98a';message.textContent='Login successful!';}
+    const loginScreen=document.getElementById('loginScreen');
+    if(loginScreen) loginScreen.style.display='none';
+    await loadState();
+  }catch(error){
+    console.error('Login error:',error);
+    if(message){message.style.color='#f27c7c';message.textContent=error.message;}
+  }finally{
+    if(loginButton){loginButton.disabled=false;loginButton.textContent='Login';}
+  }
+}
+window.loginUser=loginUser;
+
+const loginForm=document.getElementById('loginForm');
+if(loginForm){
+  loginForm.addEventListener('submit',function(event){
+    event.preventDefault();
+    const username=document.getElementById('loginUsername').value.trim();
+    const password=document.getElementById('loginPassword').value;
+    const message=document.getElementById('loginMessage');
+    if(!username||!password){if(message){message.style.color='#f27c7c';message.textContent='Please enter username and password.';}return;}
+    loginUser(username,password);
+  });
+}
+
+function checkLogin(){
+  const token=localStorage.getItem('bcp_access_token');
+  const role=localStorage.getItem('bcp_role');
+  if(token&&role&&NAV[role]){
+    currentRole=role;
+    if(!currentTab[role]) currentTab[role]=NAV[role][0][0];
+    const loginScreen=document.getElementById('loginScreen');
+    if(loginScreen) loginScreen.style.display='none';
+  }
+  selectLoginRole(role&&NAV[role]?role:'attendant');
+}
+
+function logoutUser(){
+  localStorage.removeItem('bcp_access_token');
+  localStorage.removeItem('bcp_username');
+  localStorage.removeItem('bcp_name');
+  localStorage.removeItem('bcp_role');
+  location.reload();
+}
+window.logoutUser=logoutUser;
+
+checkLogin();
+loadState();
+
+</script>
+</body>
+</html>

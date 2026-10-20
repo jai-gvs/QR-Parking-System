@@ -1,0 +1,6 @@
+C:\Users\julian\Downloads\bcp_qr_parking_python\guard-app\obj\Debug\net8.0\BcpParking.Api.csproj.AssemblyReference.cache
+C:\Users\julian\Downloads\bcp_qr_parking_python\guard-app\obj\Debug\net8.0\BcpParking.Api.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\julian\Downloads\bcp_qr_parking_python\guard-app\obj\Debug\net8.0\BcpParking.Api.AssemblyInfoInputs.cache
+C:\Users\julian\Downloads\bcp_qr_parking_python\guard-app\obj\Debug\net8.0\BcpParking.Api.AssemblyInfo.cs
+C:\Users\julian\Downloads\bcp_qr_parking_python\guard-app\obj\Debug\net8.0\BcpParking.Api.csproj.CoreCompileInputs.cache
+C:\Users\julian\Downloads\bcp_qr_parking_python\guard-app\obj\Debug\net8.0\BcpParking.Api.MvcApplicationPartsAssemblyInfo.cache

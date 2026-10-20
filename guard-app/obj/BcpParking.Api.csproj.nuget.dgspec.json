@@ -1,0 +1,83 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\julian\\Downloads\\bcp_qr_parking_python\\guard-app\\BcpParking.Api.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\julian\\Downloads\\bcp_qr_parking_python\\guard-app\\BcpParking.Api.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\julian\\Downloads\\bcp_qr_parking_python\\guard-app\\BcpParking.Api.csproj",
+        "projectName": "BcpParking.Api",
+        "projectPath": "C:\\Users\\julian\\Downloads\\bcp_qr_parking_python\\guard-app\\BcpParking.Api.csproj",
+        "packagesPath": "C:\\Users\\julian\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\julian\\Downloads\\bcp_qr_parking_python\\guard-app\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\julian\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Isopoh.Cryptography.Argon2": {
+              "target": "Package",
+              "version": "[1.1.*, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[8.0.*, )"
+            },
+            "Microsoft.Data.Sqlite": {
+              "target": "Package",
+              "version": "[8.0.*, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.425/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

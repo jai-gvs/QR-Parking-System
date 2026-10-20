@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "dgSpecHash": "5RNJOYXqVW8=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\julian\\Downloads\\bcp_qr_parking_python\\guard-app\\BcpParking.Api.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\julian\\.nuget\\packages\\isopoh.cryptography.argon2\\1.1.12\\isopoh.cryptography.argon2.1.1.12.nupkg.sha512",
+    "C:\\Users\\julian\\.nuget\\packages\\isopoh.cryptography.blake2b\\1.1.12\\isopoh.cryptography.blake2b.1.1.12.nupkg.sha512",
+    "C:\\Users\\julian\\.nuget\\packages\\isopoh.cryptography.securearray\\1.1.12\\isopoh.cryptography.securearray.1.1.12.nupkg.sha512",
+    "C:\\Users\\julian\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\8.0.31\\microsoft.aspnetcore.authentication.jwtbearer.8.0.31.nupkg.sha512",
+    "C:\\Users\\julian\\.nuget\\packages\\microsoft.data.sqlite\\8.0.31\\microsoft.data.sqlite.8.0.31.nupkg.sha512",
+    "C:\\Users\\julian\\.nuget\\packages\\microsoft.data.sqlite.core\\8.0.31\\microsoft.data.sqlite.core.8.0.31.nupkg.sha512",
+    "C:\\Users\\julian\\.nuget\\packages\\microsoft.identitymodel.abstractions\\7.7.3\\microsoft.identitymodel.abstractions.7.7.3.nupkg.sha512",
+    "C:\\Users\\julian\\.nuget\\packages\\microsoft.identitymodel.jsonwebtokens\\7.7.3\\microsoft.identitymodel.jsonwebtokens.7.7.3.nupkg.sha512",
+    "C:\\Users\\julian\\.nuget\\packages\\microsoft.identitymodel.logging\\7.7.3\\microsoft.identitymodel.logging.7.7.3.nupkg.sha512",
+    "C:\\Users\\julian\\.nuget\\packages\\microsoft.identitymodel.protocols\\7.7.3\\microsoft.identitymodel.protocols.7.7.3.nupkg.sha512",
+    "C:\\Users\\julian\\.nuget\\packages\\microsoft.identitymodel.protocols.openidconnect\\7.7.3\\microsoft.identitymodel.protocols.openidconnect.7.7.3.nupkg.sha512",
+    "C:\\Users\\julian\\.nuget\\packages\\microsoft.identitymodel.tokens\\7.7.3\\microsoft.identitymodel.tokens.7.7.3.nupkg.sha512",
+    "C:\\Users\\julian\\.nuget\\packages\\sqlitepclraw.bundle_e_sqlite3\\2.1.12\\sqlitepclraw.bundle_e_sqlite3.2.1.12.nupkg.sha512",
+    "C:\\Users\\julian\\.nuget\\packages\\sqlitepclraw.core\\2.1.12\\sqlitepclraw.core.2.1.12.nupkg.sha512",
+    "C:\\Users\\julian\\.nuget\\packages\\sqlitepclraw.lib.e_sqlite3\\2.1.12\\sqlitepclraw.lib.e_sqlite3.2.1.12.nupkg.sha512",
+    "C:\\Users\\julian\\.nuget\\packages\\sqlitepclraw.provider.e_sqlite3\\2.1.12\\sqlitepclraw.provider.e_sqlite3.2.1.12.nupkg.sha512",
+    "C:\\Users\\julian\\.nuget\\packages\\system.identitymodel.tokens.jwt\\7.7.3\\system.identitymodel.tokens.jwt.7.7.3.nupkg.sha512",
+    "C:\\Users\\julian\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512"
+  ],
+  "logs": []
+}
